@@ -113,50 +113,6 @@ impl Nodeless {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Paywall {
-    id: String,
-    name: String,
-    #[serde(rename = "type")]
-    type_: String,
-    price: u64,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WebHookResponse {
-    id: Option<String>,
-    #[serde(with = "serde_url")]
-    url: Url,
-    status: String,
-    events: Vec<String>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub enum WebHookType {
-    #[serde(rename = "store")]
-    Store,
-    #[serde(rename = "donation_page")]
-    DonationPage,
-    #[serde(rename = "paywall")]
-    Paywall,
-    #[serde(rename = "inbox")]
-    Inbox,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CreatePaywallWebhookRequest {
-    #[serde(rename = "type")]
-    pub type_: WebHookType,
-    #[serde(with = "serde_url")]
-    pub url: Url,
-    pub events: Vec<String>,
-    pub secret: String,
-    pub status: String,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ServerStatusResponse {
     pub code: u32,
     pub status: String,
