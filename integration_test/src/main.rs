@@ -1,34 +1,38 @@
+//! Integration test for nodeless api
+
+#![deny(unused)]
+
 use std::str::FromStr;
 
 use nodeless_rs::paywall::Paywall;
-use nodeless_rs::webhook::{CreateWebhook, WebHookType, Webhook, WebhookEvent, WebhookStatus};
-use url::Url;
-
 use nodeless_rs::store::{InvoiceRequest, InvoiceStatus};
+use nodeless_rs::webhook::{CreateWebhook, WebHookType, WebhookEvent, WebhookStatus};
 use nodeless_rs::Nodeless;
+use std::env;
+use url::Url;
 
 #[tokio::main]
 async fn main() {
-    let api_key = "<Api Key>";
+    dotenvy::from_path("integration_test/.env").expect("Messed up dev env");
+    let api_key = env::var("API_KEY").unwrap();
 
-    let store_id = "";
-    let transaction_id = "";
+    let store_id = env::var("STORE_ID").unwrap();
 
-    let nodeless = Nodeless::new(api_key, None).unwrap();
+    let nodeless = Nodeless::new(&api_key, None).unwrap();
     test_get_server_status(&nodeless).await;
 
     // Store
     test_get_stores(&nodeless).await;
-    test_get_store(&nodeless, store_id).await;
+    test_get_store(&nodeless, &store_id).await;
 
     // Store Invoice
-    let invoice_id = test_create_store_invoice(&nodeless, store_id).await;
-    test_get_store_invoice(&nodeless, store_id, &invoice_id).await;
-    test_get_store_invoice_status(&nodeless, store_id, &invoice_id).await;
+    let invoice_id = test_create_store_invoice(&nodeless, &store_id).await;
+    test_get_store_invoice(&nodeless, &store_id, &invoice_id).await;
+    test_get_store_invoice_status(&nodeless, &store_id, &invoice_id).await;
 
     // Transaction
-    test_get_transactions(&nodeless).await;
-    test_get_transaction(&nodeless, transaction_id).await;
+    let transaction_id = test_get_transactions(&nodeless).await;
+    test_get_transaction(&nodeless, &transaction_id).await;
 
     // Paywall
     let paywall_id = test_create_paywall(&nodeless).await;
@@ -42,18 +46,16 @@ async fn main() {
     test_get_paywall_request_status(&nodeless, &paywall_id, &paywall_request_id).await;
 
     // Store web hooks
-    let webhook = test_create_store_webhook(&nodeless, store_id).await;
-    test_get_store_webhooks(&nodeless, store_id).await;
-    let webhook_id = webhook.id.unwrap();
-    test_get_store_webhook(&nodeless, store_id, &webhook_id).await;
-    test_update_store_webhook(&nodeless, store_id, &webhook_id).await;
-    test_get_store_webhooks(&nodeless, store_id).await;
-    test_delete_store_webhook(&nodeless, store_id, &webhook_id).await;
+    let webhook_id = test_create_store_webhook(&nodeless, &store_id).await;
+    test_get_store_webhooks(&nodeless, &store_id).await;
+    test_get_store_webhook(&nodeless, &store_id, &webhook_id).await;
+    test_update_store_webhook(&nodeless, &store_id, &webhook_id).await;
+    test_get_store_webhooks(&nodeless, &store_id).await;
+    test_delete_store_webhook(&nodeless, &store_id, &webhook_id).await;
 
     // Paywall webhooks
-    let webhook = test_create_paywall_webhook(&nodeless, &paywall_id).await;
+    let webhook_id = test_create_paywall_webhook(&nodeless, &paywall_id).await;
     test_get_paywall_webhooks(&nodeless, &paywall_id).await;
-    let webhook_id = webhook.id.unwrap();
     test_get_paywall_webhook(&nodeless, &paywall_id, &webhook_id).await;
     test_update_paywall_webhook(&nodeless, &paywall_id, &webhook_id).await;
     test_get_paywall_webhooks(&nodeless, &paywall_id).await;
@@ -61,6 +63,8 @@ async fn main() {
 
     // Delete pay wall
     test_delete_paywall(&nodeless, &paywall_id).await;
+
+    println!("Tests Passed")
 }
 
 async fn test_get_server_status(nodeless: &Nodeless) {
@@ -69,14 +73,13 @@ async fn test_get_server_status(nodeless: &Nodeless) {
 }
 
 async fn test_get_stores(nodeless: &Nodeless) {
-    let _stores = nodeless.get_stores().await.unwrap();
-    // assert_eq!(status.code, 200);
+    let stores = nodeless.get_stores().await.unwrap();
+    assert!(!stores.is_empty());
 }
 
-async fn test_get_store(nodeless: &Nodeless, id: &str) {
-    let stores = nodeless.get_store(id).await.unwrap();
-    println!("{:?}", stores);
-    //  assert_eq!(status.code, 200);
+async fn test_get_store(nodeless: &Nodeless, store_id: &str) {
+    let store = nodeless.get_store(store_id).await.unwrap();
+    assert_eq!(store.id, store_id);
 }
 
 async fn test_create_store_invoice(nodeless: &Nodeless, store_id: &str) -> String {
@@ -127,9 +130,10 @@ async fn test_get_transaction(nodeless: &Nodeless, id: &str) {
     assert_eq!(transaction.id, id);
 }
 
-async fn test_get_transactions(nodeless: &Nodeless) {
+async fn test_get_transactions(nodeless: &Nodeless) -> String {
     let transactions = nodeless.get_transactions(false).await.unwrap();
-    println!("{:?}", transactions);
+    assert!(!transactions.is_empty());
+    transactions[0].id.clone()
 }
 
 async fn test_create_paywall(nodeless: &Nodeless) -> String {
@@ -183,7 +187,7 @@ async fn test_delete_paywall(nodeless: &Nodeless, id: &str) {
     nodeless.delete_paywall(id).await.unwrap();
 }
 
-async fn test_create_store_webhook(nodeless: &Nodeless, id: &str) -> Webhook {
+async fn test_create_store_webhook(nodeless: &Nodeless, id: &str) -> String {
     let webhook = CreateWebhook {
         type_: nodeless_rs::webhook::WebHookType::Store,
         url: Url::from_str("https://nodless.io").unwrap(),
@@ -192,7 +196,12 @@ async fn test_create_store_webhook(nodeless: &Nodeless, id: &str) -> Webhook {
         status: nodeless_rs::webhook::WebhookStatus::Inactive,
     };
 
-    nodeless.create_store_webhook(id, webhook).await.unwrap()
+    nodeless
+        .create_store_webhook(id, webhook)
+        .await
+        .unwrap()
+        .id
+        .unwrap()
 }
 
 async fn test_get_store_webhooks(nodeless: &Nodeless, store_id: &str) {
@@ -232,7 +241,7 @@ async fn test_update_store_webhook(nodeless: &Nodeless, store_id: &str, webhook_
     assert_eq!(res.url.unwrap(), webhook.url);
 }
 
-async fn test_create_paywall_webhook(nodeless: &Nodeless, id: &str) -> Webhook {
+async fn test_create_paywall_webhook(nodeless: &Nodeless, id: &str) -> String {
     let webhook = CreateWebhook {
         type_: nodeless_rs::webhook::WebHookType::Paywall,
         url: Url::from_str("https://nodless.io").unwrap(),
@@ -241,7 +250,12 @@ async fn test_create_paywall_webhook(nodeless: &Nodeless, id: &str) -> Webhook {
         status: nodeless_rs::webhook::WebhookStatus::Inactive,
     };
 
-    nodeless.create_paywall_webhook(id, webhook).await.unwrap()
+    nodeless
+        .create_paywall_webhook(id, webhook)
+        .await
+        .unwrap()
+        .id
+        .unwrap()
 }
 
 async fn test_get_paywall_webhooks(nodeless: &Nodeless, paywall_id: &str) {
