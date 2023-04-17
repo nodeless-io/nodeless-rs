@@ -1,3 +1,5 @@
+//! Webhook Types
+
 use serde::{Deserialize, Serialize};
 use url::Url;
 

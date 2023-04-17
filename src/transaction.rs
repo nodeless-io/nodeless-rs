@@ -1,3 +1,4 @@
+//! Transactions
 use std::collections::HashMap;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};

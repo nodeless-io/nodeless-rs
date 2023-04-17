@@ -1,3 +1,4 @@
+//! Nodeless API SDK
 use std::str::FromStr;
 
 use error::NodelessError;
@@ -7,7 +8,9 @@ use serde_json::Value;
 
 pub mod error;
 pub mod paywall;
+pub mod paywall_webhook;
 pub mod store;
+pub mod store_webhook;
 pub mod transaction;
 pub mod webhook;
 
@@ -117,13 +120,6 @@ pub struct ServerStatusResponse {
     pub code: u32,
     pub status: String,
     pub node: String,
-}
-
-pub fn serialize_url<S>(url: &Url, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    serializer.serialize_str(url.as_ref())
 }
 
 mod serde_url {
