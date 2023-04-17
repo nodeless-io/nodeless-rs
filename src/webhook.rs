@@ -22,6 +22,8 @@ pub enum WebhookEvent {
     Underpaid,
     #[serde(rename = "overpaid")]
     Overpaid,
+    #[serde(rename = "in_flight")]
+    InFlight,
 }
 
 /// Type of webhook
