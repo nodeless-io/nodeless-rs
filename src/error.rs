@@ -1,3 +1,4 @@
+//! Nodeless Error
 #[derive(Debug, thiserror::Error)]
 pub enum NodelessError {
     #[error("url error: {0}")]

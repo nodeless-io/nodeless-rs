@@ -1,3 +1,5 @@
+//! Paywall Webhook
+
 use crate::error::NodelessError;
 use crate::webhook::{CreateWebhook, Webhook};
 use crate::Nodeless;

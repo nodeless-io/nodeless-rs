@@ -3,8 +3,9 @@
 use serde::{Deserialize, Serialize};
 use url::Url;
 
-use crate::{opt_serde_timestamp, opt_serde_url, serde_url};
+use crate::serde_utils::{opt_serde_timestamp, opt_serde_url, serde_url};
 
+/// Event type where webhook is triggered
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum WebhookEvent {
     #[serde(rename = "new")]
@@ -23,6 +24,7 @@ pub enum WebhookEvent {
     Overpaid,
 }
 
+/// Type of webhook
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum WebHookType {
     #[serde(rename = "store")]
@@ -35,6 +37,7 @@ pub enum WebHookType {
     Inbox,
 }
 
+/// Status of webhook
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum WebhookStatus {
     #[serde(rename = "active")]
@@ -43,6 +46,7 @@ pub enum WebhookStatus {
     Inactive,
 }
 
+/// Create Webhook Information
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CreateWebhook {
     #[serde(rename = "type")]
@@ -54,6 +58,7 @@ pub struct CreateWebhook {
     pub status: WebhookStatus,
 }
 
+/// Webhook
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Webhook {
     pub id: Option<String>,

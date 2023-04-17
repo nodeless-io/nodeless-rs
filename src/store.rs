@@ -5,9 +5,10 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use url::Url;
 
 use crate::error::NodelessError;
+use crate::serde_utils::{opt_serde_timestamp, opt_serde_url, serde_timestamp, serde_url};
 use crate::Nodeless;
-use crate::{opt_serde_timestamp, opt_serde_url, serde_timestamp, serde_url};
 
+/// Store
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Store {
@@ -20,6 +21,7 @@ pub struct Store {
     pub created_at: i64,
 }
 
+/// Invoice Request
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InvoiceRequest {
@@ -31,6 +33,7 @@ pub struct InvoiceRequest {
     pub metadata: Option<HashMap<String, String>>,
 }
 
+/// Invoice
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Invoice {
@@ -54,6 +57,7 @@ pub struct Invoice {
     pub qr_codes: QrCodes,
 }
 
+/// Invoice Status
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum InvoiceStatus {
     New,
@@ -91,6 +95,7 @@ impl Serialize for InvoiceStatus {
     }
 }
 
+// QR Code
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QrCodes {

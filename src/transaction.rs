@@ -4,9 +4,10 @@ use std::collections::HashMap;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::error::NodelessError;
+use crate::serde_utils::{opt_serde_timestamp, serde_timestamp};
 use crate::Nodeless;
-use crate::{opt_serde_timestamp, serde_timestamp};
 
+/// Transactable Type
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TransactableType {
     Donation,
@@ -38,6 +39,7 @@ impl Serialize for TransactableType {
     }
 }
 
+/// Transaction Status
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TransactionStatus {
     Settled,
@@ -69,6 +71,7 @@ impl Serialize for TransactionStatus {
     }
 }
 
+/// Transactable
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Transactable {
     id: u64,
@@ -90,6 +93,7 @@ pub struct Transactable {
     paid_at: Option<i64>,
 }
 
+/// Transaction
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Transaction {
     pub id: String,

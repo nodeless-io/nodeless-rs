@@ -1,11 +1,13 @@
+//! Paywall
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
 use crate::error::NodelessError;
+use crate::serde_utils::{opt_serde_timestamp, serde_timestamp};
 use crate::Nodeless;
-use crate::{opt_serde_timestamp, serde_timestamp};
 
+/// Paywall Types
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum PaywallType {
     #[serde(rename = "content")]
@@ -18,6 +20,7 @@ pub enum PaywallType {
     WPArticle,
 }
 
+/// Paywall
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Paywall {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,6 +36,7 @@ pub struct Paywall {
     pub updated_at: Option<i64>,
 }
 
+/// Paywall Request
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaywallRequest {
