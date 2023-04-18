@@ -3,6 +3,7 @@ name = "nodeless-rs"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+documentation = "https://docs.rs/nodeless-rs"
 repository = "https://github.com/nodeless-io/nodeless-rs"
 description = "Rust SDK for the Nodeless API"
 exclude = ["integration_test"]

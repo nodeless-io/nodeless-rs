@@ -1,3 +1,6 @@
+[![crates.io](https://img.shields.io/crates/v/nodeless-rs)](https://crates.io/crates/nodeless-rs)
+[![Documentation](https://docs.rs/nodeless-rs/badge.svg)](https://docs.rs/nodeless-rs)
+
 ## Quickstart
 
 ```rust
